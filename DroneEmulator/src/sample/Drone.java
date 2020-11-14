@@ -22,6 +22,10 @@ public class Drone {
 
     }
 
+    public Point getLocationInXY() {
+        return new Point((int)this.location.getX()-250, (int)(300-this.location.getY()));
+    }
+
     private void InitializeCanvas(GraphicsContext graphicsContext, javafx.scene.canvas.Canvas canvas) {
         graphicsContext.setStroke(Color.LIGHTGREY);
         graphicsContext.setLineWidth(1);
