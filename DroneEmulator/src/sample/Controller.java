@@ -50,7 +50,6 @@ public class Controller {
         InitializeDrone();
         InitializeLineChart();
 
-        //add udp server/reeciver
         receiver = new UdpPackageReceiver(receivedPackages, 8000);
         new Thread(receiver).start();
 
@@ -79,8 +78,6 @@ public class Controller {
         receivedColumnSend.setCellValueFactory(
                 new PropertyValueFactory<UdpPackage, String>("fromIp")
         );
-
-
         receivedColumnFromPort.setCellValueFactory(
                 new PropertyValueFactory<UdpPackage, String>("fromPort")
         );
@@ -91,6 +88,7 @@ public class Controller {
                 new PropertyValueFactory<UdpPackage, String>("dataAsHex")
         );
 
+        //Set listener to the list for processing receiving messages
         tableViewReceivedPackages.getItems().addListener(new ListChangeListener() {
             @Override
             public void onChanged(Change change) {
@@ -118,13 +116,15 @@ public class Controller {
         else if (receivedPackage.isCommand("stop"))
             drone.stop(canvas);
 
+        UpdateLineChartData();
 
+    }
 
+    private void UpdateLineChartData() {
         final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
         Date now = new Date();
         HeightData.add(new XYChart.Data(simpleDateFormat.format(now), drone.getLocationInXY().getY()));
         locationData.add(new XYChart.Data(simpleDateFormat.format(now), drone.getLocationInXY().getX()));
-
     }
 
 

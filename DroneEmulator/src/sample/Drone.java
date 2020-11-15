@@ -22,14 +22,16 @@ public class Drone {
 
     }
 
+    //Property will show the location based on zero point which in (350, 300) in our canvas
     public Point getLocationInXY() {
-        return new Point((int)this.location.getX()-250, (int)(300-this.location.getY()));
+        return new Point((int)this.location.getX()-350, (int)(300-this.location.getY()));
     }
 
     private void InitializeCanvas(GraphicsContext graphicsContext, javafx.scene.canvas.Canvas canvas) {
         graphicsContext.setStroke(Color.LIGHTGREY);
         graphicsContext.setLineWidth(1);
 
+        // draw 3D space lines
         graphicsContext.beginPath();
         graphicsContext.moveTo(100, 0);
         graphicsContext.lineTo(100, 250);
@@ -49,6 +51,7 @@ public class Drone {
         graphicsContext.setStroke(color);
         graphicsContext.setLineWidth(lineWidth);
 
+        //Draw drone
         graphicsContext.strokeOval(location.getX(), location.getY(), 50, 20);
         graphicsContext.beginPath();
         graphicsContext.moveTo(location.getX() + 25, location.getY() + 10);

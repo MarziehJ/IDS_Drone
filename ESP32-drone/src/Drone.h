@@ -11,31 +11,30 @@
 class Drone
 {
 public:
-  Drone(int xJoyPin, int yJoyPin, int buttonPin, int ledPin, uint8_t lcd_addr)
+  Drone(int xJoyPin, int yJoyPin, int buttonPin, int ledPin, uint8_t lcd_addr, bool isEmulator)
   {
 
     this->joystick = new Joystick(xJoyPin, yJoyPin);
     this->button = new Button(buttonPin);
     this->lcd = new Lcd(lcd_addr);
     this->led = new Led(ledPin);
+    this->isEmulator = isEmulator;
   }
-  bool droneIsOn() { return this->led->state; }
+
+  bool droneIsOn()
+  {
+    return this->led->state;
+  }
 
   void sendCommand(String msg)
   {
-    ////PixelEmulator
     udp.writeTo((const uint8_t *)msg.c_str(),
-                msg.length(),
-                IPAddress(192, 168, 1, 2),
-                8000);
+                  msg.length(),
+                  getAddress(),
+                  getPort());
 
-    //Real Drone
-    // udp.writeTo((const uint8_t *)msg.c_str(),
-    //             msg.length(),
-    //             IPAddress(192, 168, 10, 1),
-    //             7000);
-
-    this->lcd->WriteMessage(msg);
+  
+    this->lcd->WriteSendCommand(msg, getAddress().toString());
     Serial.println(msg);
   }
 
@@ -68,27 +67,31 @@ private:
   Lcd *lcd;
   Led *led;
   AsyncUDP udp;
+  bool isEmulator;
 
   void StopDrone()
   {
-    //PixelEmulator
-    sendCommand("stop");
-
-    //Real Drone
-    //sendCommand("land");
+    if (isEmulator)
+      sendCommand("stop");
+    else //Real Drone
+      sendCommand("land");
     this->led->off();
     Serial.println(led->status());
   }
 
   void InitDrone()
   {
-    //PixelEmulator
-    sendCommand("init");
-    sendCommand("takeoff");
-
-    //Real Drone
-    //sendCommand("command");
-    //sendCommand("takeoff");
+    if (isEmulator)
+    {
+      sendCommand("init");
+      sendCommand("takeoff");
+    }
+    else
+    {
+      //Real Drone
+      sendCommand("command");
+      sendCommand("takeoff");
+    }
 
     this->led->on();
     Serial.println(led->status());
@@ -96,24 +99,51 @@ private:
   void MoveDrone(std::pair<int, int> xy)
   {
     //PixelEmulator
-
     Serial.print("X: ");
     Serial.println(xy.first);
     Serial.print("Y: ");
     Serial.println(xy.second);
-    if (xy.first == 0)
-      sendCommand("down");
-    else if  (xy.second == 0)
-      sendCommand("left");
-    else if (xy.first  <= 2000)
-       sendCommand("right");
-    else sendCommand("top");
-   
-      //PixelEmulator
-
-      //Real Drone
-      //sendCommand("right 1");
+    if (isEmulator)
+    {
+      if (xy.first == 0)
+        sendCommand("down");
+      else if (xy.second == 0)
+        sendCommand("left");
+      else if (xy.first <= 2000)
+        sendCommand("right");
+      else
+        sendCommand("top");
+    }
+    else
+    {
+      if (xy.first == 0)
+        sendCommand("down 10");
+      else if (xy.second == 0)
+        sendCommand("left 10");
+      else if (xy.first <= 2000)
+        sendCommand("right 10");
+      else
+        sendCommand("up 10");
+    }
   }
+
+  IPAddress getAddress()
+  {
+    if (isEmulator)
+      return IPAddress(192, 168, 1, 39);
+    else
+      return IPAddress(192, 168, 10, 1);
+  }
+
+  int getPort()
+  {
+    if (isEmulator)
+      return 8000;
+    else
+      return 8890;
+  }
+
+  
 };
 
 #endif

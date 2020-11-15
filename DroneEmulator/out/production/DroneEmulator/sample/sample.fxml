@@ -29,7 +29,7 @@
             </center>
         </BorderPane>
     </left>
-    <right>
+    <center>
         <LineChart fx:id="chartLocations" title="Realtime Drone Location" BorderPane.alignment="CENTER"
                    prefHeight="500">
             <xAxis>
@@ -39,7 +39,7 @@
                 <NumberAxis side="LEFT" label="location"/>
             </yAxis>
         </LineChart>
-    </right>
+    </center>
     <bottom>
         <FlowPane prefWidth="800.0" BorderPane.alignment="CENTER">
             <children>
